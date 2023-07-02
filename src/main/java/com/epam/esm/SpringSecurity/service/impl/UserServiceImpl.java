@@ -2,6 +2,7 @@ package com.epam.esm.SpringSecurity.service.impl;
 
 import com.epam.esm.SpringSecurity.exception.NotFoundException;
 import com.epam.esm.SpringSecurity.repository.RoleRepository;
+import com.epam.esm.SpringSecurity.repository.entity.Role;
 import com.epam.esm.SpringSecurity.repository.entity.User;
 import com.epam.esm.SpringSecurity.repository.impl.UserRepositoryImpl;
 import com.epam.esm.SpringSecurity.service.UserService;
@@ -81,7 +82,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         return userMapper.mapEntityToDto(lastAdded);
     }
-    public User findByUserName(String username){
+
+    public User findByUserName(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User with name=" + username + " not found"));
     }
 
@@ -95,8 +97,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         );
     }
 
-    public void createNewUser(User user){
-        user.setRoles(List.of(roleRepository.findByName("user").get()));
-        userRepository.save(user );
+    public void createNewUser(User user) {
+        Role role = roleRepository.findByName("user").orElseThrow(() -> new NotFoundException("Role with name=user not exist"));
+        user.setRoles(List.of(role));
+        userRepository.save(user);
     }
 }
