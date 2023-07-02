@@ -16,5 +16,4 @@ public class UserDto extends RepresentationModel<UserDto> {
     private String lastName;
     private String email;
     private String password;
-    private Integer roleId;
 }

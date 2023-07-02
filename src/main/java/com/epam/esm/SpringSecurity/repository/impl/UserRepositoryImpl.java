@@ -2,7 +2,6 @@ package com.epam.esm.SpringSecurity.repository.impl;
 
 import com.epam.esm.SpringSecurity.exception.DataBaseRuntimeException;
 import com.epam.esm.SpringSecurity.repository.UserRepository;
-import com.epam.esm.SpringSecurity.repository.entity.Role;
 import com.epam.esm.SpringSecurity.repository.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -53,9 +52,6 @@ public class UserRepositoryImpl implements UserRepository {
                     .firstName(rs.getString("first_name"))
                     .lastName(rs.getString("last_name"))
                     .password(rs.getString("password"))
-                    .role(Role.builder()
-                            .id(rs.getInt("role_id"))
-                            .build())
                     .build());
             return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException exception) {

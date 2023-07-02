@@ -22,7 +22,4 @@ public class Role implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String name;
-
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-    private List<User> users = new ArrayList<>();
-}
+   }
