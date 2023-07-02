@@ -12,6 +12,7 @@ import org.springframework.hateoas.RepresentationModel;
 @Builder(toBuilder = true)
 public class UserDto extends RepresentationModel<UserDto> {
     private Integer id;
+    private String name;
     private String firstName;
     private String lastName;
     private String email;

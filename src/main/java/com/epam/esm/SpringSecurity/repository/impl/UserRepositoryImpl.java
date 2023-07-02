@@ -25,6 +25,7 @@ public class UserRepositoryImpl implements UserRepository {
             "VALUES (?, ?, ?, ?) ";
     public static final String FIND_LAST_ADDED = "SELECT * FROM users " +
             "WHERE id = (SELECT max(id) FROM users) ";
+    private static final String FIND_BY_USERNAME = "SELECT * FROM users WHERE name = ? ";
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -43,21 +44,6 @@ public class UserRepositoryImpl implements UserRepository {
 
     }
 
-    @Override
-    public Optional<User> findById(Integer id) {
-        try {
-            User user = jdbcTemplate.queryForObject(FIND_BY_ID, new Object[]{id}, (rs, rowNum) -> User.builder()
-                    .id(rs.getInt("id"))
-                    .email(rs.getString("email"))
-                    .firstName(rs.getString("first_name"))
-                    .lastName(rs.getString("last_name"))
-                    .password(rs.getString("password"))
-                    .build());
-            return Optional.ofNullable(user);
-        } catch (EmptyResultDataAccessException exception) {
-            return Optional.empty();
-        }
-    }
 
     @Override
     public Page<User> findAll(Pageable pageable) {
@@ -106,7 +92,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     public Optional<Integer> countAllByName(String name) {
-        return Optional.ofNullable(jdbcTemplate.queryForObject(COUNT_ALL_BY_NAME, new Object[]{name}, Integer.class));
+        return Optional.ofNullable(jdbcTemplate.queryForObject(COUNT_ALL_BY_NAME, Integer.class, name));
     }
 
     public Optional<User> findLastAdded() {
@@ -118,6 +104,31 @@ public class UserRepositoryImpl implements UserRepository {
                     .lastName(rs.getString("last_name"))
                     .password(rs.getString("password"))
                     .build());
+            return Optional.ofNullable(user);
+        } catch (EmptyResultDataAccessException exception) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<User> findById(Integer id) {
+        return findByParameter(FIND_BY_ID, id);
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return findByParameter(FIND_BY_USERNAME, username);
+    }
+
+    private <T> Optional<User> findByParameter(String query, T parameter) {
+        try {
+            User user = jdbcTemplate.queryForObject(query, (rs, rowNum) -> User.builder()
+                    .id(rs.getInt("id"))
+                    .email(rs.getString("email"))
+                    .firstName(rs.getString("first_name"))
+                    .lastName(rs.getString("last_name"))
+                    .password(rs.getString("password"))
+                    .build(), parameter);
             return Optional.ofNullable(user);
         } catch (EmptyResultDataAccessException exception) {
             return Optional.empty();

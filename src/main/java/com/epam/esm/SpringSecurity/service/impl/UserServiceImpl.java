@@ -1,6 +1,7 @@
 package com.epam.esm.SpringSecurity.service.impl;
 
 import com.epam.esm.SpringSecurity.exception.NotFoundException;
+import com.epam.esm.SpringSecurity.repository.RoleRepository;
 import com.epam.esm.SpringSecurity.repository.entity.User;
 import com.epam.esm.SpringSecurity.repository.impl.UserRepositoryImpl;
 import com.epam.esm.SpringSecurity.service.UserService;
@@ -12,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,13 +23,15 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepositoryImpl userRepository;
+    private final RoleRepository roleRepository;
     private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepositoryImpl userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepositoryImpl userRepository, RoleRepository roleRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
         this.userMapper = userMapper;
     }
 
@@ -52,7 +58,7 @@ public class UserServiceImpl implements UserService {
     public UserDto findById(Integer id) {
         Optional<User> byId = userRepository.findById(id);
         User user = byId.orElseThrow(() -> new NotFoundException("User with id=" + id + " not found"));
-        log.info("IN findById user with id {} was found",id);
+        log.info("IN findById user with id {} was found", id);
         return userMapper.mapEntityToDto(user);
     }
 
@@ -73,5 +79,10 @@ public class UserServiceImpl implements UserService {
         User lastAdded = userRepository.findLastAdded().orElseThrow(() -> new NotFoundException("User not found"));
 
         return userMapper.mapEntityToDto(lastAdded);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return null;
     }
 }

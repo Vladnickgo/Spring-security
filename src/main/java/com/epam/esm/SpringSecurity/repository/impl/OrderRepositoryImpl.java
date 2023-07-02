@@ -45,13 +45,13 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public Optional<Order> findById(Integer id) {
         try {
-            Order order = jdbcTemplate.queryForObject(FIND_BY_ID, new Object[]{id}, (rs, rowNum) -> Order.builder()
+            Order order = jdbcTemplate.queryForObject(FIND_BY_ID, (rs, rowNum) -> Order.builder()
                     .id(rs.getInt("id"))
                     .certificateId(rs.getInt("certificate_id"))
                     .orderDate(rs.getDate("order_date").toLocalDate())
                     .orderPrice(rs.getInt("order_price"))
                     .userId(rs.getInt("user_id"))
-                    .build());
+                    .build(), id);
             return Optional.ofNullable(order);
         } catch (EmptyResultDataAccessException exception) {
             return Optional.empty();
@@ -113,7 +113,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     public Integer countAllByUserId(Integer userId) {
-        return jdbcTemplate.queryForObject(COUNT_ALL_BY_USER_ID, new Object[]{userId}, Integer.class);
+        return jdbcTemplate.queryForObject(COUNT_ALL_BY_USER_ID, Integer.class, userId);
     }
 
     public Integer countAll() {
