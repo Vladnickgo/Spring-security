@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -80,9 +81,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         return userMapper.mapEntityToDto(lastAdded);
     }
+    public User findByUserName(String username){
+        return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User with name=" + username + " not found"));
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+        User user = findByUserName(username);
+        return new org.springframework.security.core.userdetails.User(
+                user.getName(),
+                user.getPassword(),
+                user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList()
+        );
+    }
+
+    public void createNewUser(User user){
+        user.setRoles(List.of(roleRepository.findByName("user").get()));
+        userRepository.save(user );
     }
 }
